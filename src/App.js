@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react"
+import React from "react"
 import Sidebar from "./components/Sidebar"
 import Editor from "./components/Editor"
 import { data } from "./data"
@@ -6,26 +6,21 @@ import Split from "react-split"
 import {nanoid} from "nanoid"
 
 export default function App() {
-
-// separate variable here to grab our localStorage item, there's only one key so far 
-
-    const savedNote = localStorage.getItem("note_name")
-
-// set the initial value to be the notes if it isn't undefined otherwise an empty array
-
-    const [notes, setNotes] = React.useState(() => JSON.parse(savedNote) || [])
+    /**
+     * Challenge: When the user edits a note, reposition
+     * it in the list of notes to the top of the list
+     */
+    const [notes, setNotes] = React.useState(
+        () => JSON.parse(localStorage.getItem("notes")) || []
+    )
     const [currentNoteId, setCurrentNoteId] = React.useState(
         (notes[0] && notes[0].id) || ""
     )
     
-// adding local storage 
-// useEffect monitors changes to notes, changes made here will updated localStorage on each keystroke
-
-    useEffect(() => {
-        localStorage.setItem("note_name", JSON.stringify(notes))
-        }, [notes])
-
-
+    React.useEffect(() => {
+        localStorage.setItem("notes", JSON.stringify(notes))
+    }, [notes])
+    
     function createNewNote() {
         const newNote = {
             id: nanoid(),
@@ -35,14 +30,26 @@ export default function App() {
         setCurrentNoteId(newNote.id)
     }
     
+
     function updateNote(text) {
-        setNotes(oldNotes => oldNotes.map(oldNote => {
-            return oldNote.id === currentNoteId
-                ? { ...oldNote, body: text }
-                : oldNote
-        }))
+        setNotes(oldNotes => {
+// to get the note to bump to the top, we can use a for loop instead of map 
+// the for loop either adds the Note to the end of the new array or for the one we are modifying it will use unshift to bring it to the front
+            const newArray = []
+            for(let i = 0; i < oldNotes.length; i++) {
+// create the new constant here so it's easier to use oldNote versus having to specify the index each time
+                const oldNote = oldNotes[i]
+                if(oldNote.id === currentNoteId) {
+                    newArray.unshift({ ...oldNote, body: text })
+                } else {
+                    newArray.push(oldNote)
+                }
+            }
+            return newArray
+        })
     }
     
+
     function findCurrentNote() {
         return notes.find(note => {
             return note.id === currentNoteId
