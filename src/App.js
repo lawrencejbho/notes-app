@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useState, useEffect} from "react"
 import Sidebar from "./components/Sidebar"
 import Editor from "./components/Editor"
 import { data } from "./data"
@@ -6,11 +6,26 @@ import Split from "react-split"
 import {nanoid} from "nanoid"
 
 export default function App() {
-    const [notes, setNotes] = React.useState([])
+
+// separate variable here to grab our localStorage item, there's only one key so far 
+
+    const savedNote = localStorage.getItem("note_name")
+
+// set the initial value to be the notes if it isn't undefined otherwise an empty array
+
+    const [notes, setNotes] = React.useState(() => JSON.parse(savedNote) || [])
     const [currentNoteId, setCurrentNoteId] = React.useState(
         (notes[0] && notes[0].id) || ""
     )
     
+// adding local storage 
+// useEffect monitors changes to notes, changes made here will updated localStorage on each keystroke
+
+    useEffect(() => {
+        localStorage.setItem("note_name", JSON.stringify(notes))
+        }, [notes])
+
+
     function createNewNote() {
         const newNote = {
             id: nanoid(),
