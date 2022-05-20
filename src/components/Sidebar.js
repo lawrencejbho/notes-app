@@ -2,7 +2,7 @@ import React from "react"
 
 export default function Sidebar(props) {
 
-    const noteElements = props.notes.map((note, index, body) => (
+    const noteElements = props.notes.map((note, index) => (
         
         <div key={note.id}>
             <div
@@ -16,7 +16,10 @@ export default function Sidebar(props) {
                 <h4 className="text-snippet">{note.body.split("\n")[0]}</h4>
                 <button 
                     className="delete-btn"
-                    // Your onClick event handler here
+
+    // 
+    // * we need to pass in the event that comes from onClick into deleteNote 
+                    onClick={(event) => props.deleteNote(event, note.id)}
                 >
                     <i className="gg-trash trash-icon"></i>
                 </button>

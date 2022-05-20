@@ -6,10 +6,7 @@ import Split from "react-split"
 import {nanoid} from "nanoid"
 
 export default function App() {
-    /**
-     * Challenge: When the user edits a note, reposition
-     * it in the list of notes to the top of the list
-     */
+
     const [notes, setNotes] = React.useState(
         () => JSON.parse(localStorage.getItem("notes")) || []
     )
@@ -48,8 +45,17 @@ export default function App() {
             return newArray
         })
     }
-    
 
+// we need this to stop propagating to the parent, although nothing changed when I didn't use it
+// we can modify the Notes to delete our note here using the filter method, will take out noteID and check that against the notes array
+
+    function deleteNote(event, noteId) {
+        event.stopPropagation()
+        setNotes( oldNotes => oldNotes.filter(note => note.id !== noteId))
+    }
+
+
+    
     function findCurrentNote() {
         return notes.find(note => {
             return note.id === currentNoteId
@@ -71,6 +77,7 @@ export default function App() {
                     currentNote={findCurrentNote()}
                     setCurrentNoteId={setCurrentNoteId}
                     newNote={createNewNote}
+                    deleteNote={deleteNote}
                 />
                 {
                     currentNoteId && 
